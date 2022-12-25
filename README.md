@@ -13,10 +13,19 @@ cargo r
 
 ## Examples
 
-```
+<table>
+
+<tr><th>Source code</th><th>Preview</th></td>
+
+<tr>
+<td>
+<pre>
 fn squircle(x: f32) -> f32 {
     (1.0 - (x).abs().powf(4.0)).powf(0.25)
 }
-```
+</pre>
+</td>
+<td><img src="images/squircle.png"></td>
+</tr>
 
-![Test](images/squircle.png)
+</table>
