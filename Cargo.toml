@@ -1,0 +1,9 @@
+[package]
+name = " bevy-single-variable-function-mesh"
+version = "0.1.0"
+authors = ["Armin Schäfer"]
+readme = "README.md"
+edition = "2021"
+
+[dependencies]
+bevy = "0.9"
