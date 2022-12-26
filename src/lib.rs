@@ -17,8 +17,8 @@ impl Default for SingleVariableFunctionMesh {
             x_start: -1.0,
             x_end: 1.0,
             relative_depth: 0.2,
-            vertices_per_side: 50,
-            vertices_thickness: 25,
+            vertices_per_side: 30,
+            vertices_thickness: 20,
         }
     }
 }
@@ -44,19 +44,32 @@ impl From<SingleVariableFunctionMesh> for Mesh {
         let amount = ring.len();
         let mut vertices: Vec<([f32; 3], [f32; 3], [f32; 2])> = Vec::with_capacity(amount + 1);
         let mut indeces: Vec<u32> = Vec::with_capacity(amount);
+        let height = mathfunction.relative_depth;
 
-        vertices.push(([0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0]));
+        vertices.push(([0.0, -height, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0]));
         for segment in 0..mathfunction.vertices_thickness {
             for i in 0..amount {
-				let vorzeichen = { if ring[i][1] >= 0.0 { 1.0 } else { -1.0 } };
-				let vorzeichen2 = { if ring[i][0] >= 0.0 { 1.0 } else { -1.0 } };
+                let vorzeichen = {
+                    if ring[i][1] >= 0.0 {
+                        1.0
+                    } else {
+                        -1.0
+                    }
+                };
+                let vorzeichen2 = {
+                    if ring[i][0] >= 0.0 {
+                        1.0
+                    } else {
+                        -1.0
+                    }
+                };
                 let x = ring[i][0] + vorzeichen2 * ring2[segment][1] * mathfunction.relative_depth;
                 let y = ring2[segment][0] / (1.0 / mathfunction.relative_depth);
                 let z = ring[i][1] + vorzeichen * ring2[segment][1] * mathfunction.relative_depth;
                 vertices.push(([x, y, z], [1.0, 1.0, 1.0], [0.0, 0.0]));
             }
         }
-        vertices.push(([0.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0]));
+        vertices.push(([0.0, height, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0]));
 
         for segment in 0..mathfunction.vertices_thickness {
             if mathfunction.vertices_thickness == 1 {
@@ -65,25 +78,25 @@ impl From<SingleVariableFunctionMesh> for Mesh {
             if segment == 0 {
                 for i in 0..amount {
                     if i == amount - 1 {
-                        indeces.append(&mut vec![
-                            1,
-                            (segment * amount + i + 1).try_into().unwrap(),
-                            0,
-                        ]);
+                        indeces.append(&mut vec![1, (i + 1).try_into().unwrap(), 0]);
                     } else {
                         indeces.append(&mut vec![
-                            (segment * amount + i + 2).try_into().unwrap(),
-                            (segment * amount + i + 1).try_into().unwrap(),
+                            (i + 2).try_into().unwrap(),
+                            (i + 1).try_into().unwrap(),
                             0,
                         ]);
                     }
                 }
             } else {
                 for i in 0..amount {
-                    let tl = (segment * amount + i) as u32;
-                    let tr = (segment * amount + i + 1) as u32;
-                    let bl = ((segment - 1) * amount + i) as u32;
-                    let br = ((segment - 1) * amount + i + 1) as u32;
+                    let tl = (segment * amount + i + 1) as u32;
+                    let mut tr = (segment * amount + i + 2) as u32;
+                    let bl = ((segment - 1) * amount + i + 1) as u32;
+                    let mut br = ((segment - 1) * amount + i + 2) as u32;
+                    if i == amount - 1 {
+                        tr = (segment * amount + 0 + 1) as u32;
+                        br = ((segment - 1) * amount + 0 + 1) as u32;
+                    }
                     indeces.append(&mut vec![br, tr, tl]);
                     indeces.append(&mut vec![bl, br, tl]);
                 }
