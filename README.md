@@ -1,7 +1,7 @@
 # bevy-single-variable-function-mesh
 
 This crate creates procedurally generated 2D or 3D bevy meshes by using
-single-variable functions. Since only function is needed, this library is very
+single-variable functions. Since only one function is needed, this library is very
 easy to use.
 
 ## Usage
