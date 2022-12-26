@@ -1,14 +1,22 @@
 # bevy-single-variable-function-mesh
 
 This crate creates procedurally generated 2D or 3D bevy meshes by using
-single-variable functions.
+single-variable functions. Since only function is needed, this crate is very
+easy to use.
 
-Warning: This project is in an very early stage and a lot of code is missing.
+## Usage
 
-## Build
+Add this to your ```Cargo.toml```:
 
 ```
-cargo r
+[dependencies]
+bevy-single-variable-function-mesh = "0.1"
+```
+
+And this to your .rs file.
+
+```
+use bevy_single_variable_function_mesh::SingleVariableFunctionMesh;
 ```
 
 ## Examples
@@ -22,6 +30,16 @@ cargo r
 <pre>
 fn squircle(x: f32) -> f32 {
     (1.0 - (x).abs().powf(4.0)).powf(0.25)
+}
+</pre>
+<pre>
+let mesh: Mesh = SingleVariableFunctionMesh {
+    f: squircle,
+    x_start: -1.0,
+    x_end: 1.0,
+    relative_depth: 0.0,
+    vertices_per_side: 50,
+    vertices_thickness: 1,
 }
 </pre>
 </td>
