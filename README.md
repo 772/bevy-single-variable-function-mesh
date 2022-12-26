@@ -40,7 +40,7 @@ let mesh: Mesh = SingleVariableFunctionMesh {
     relative_depth: 0.0,
     vertices_per_side: 50,
     vertices_thickness: 1,
-}
+};
 </pre>
 </td>
 <td><img src="images/squircle.png"></td>
