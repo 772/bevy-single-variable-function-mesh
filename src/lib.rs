@@ -1,4 +1,4 @@
-use bevy::render::mesh::{Mesh, Indices, PrimitiveTopology};
+use bevy::render::mesh::{Indices, Mesh, PrimitiveTopology};
 
 /// A 2D or 3D mesh generated from a single-variable function.
 pub struct SingleVariableFunctionMesh {
@@ -16,9 +16,9 @@ impl Default for SingleVariableFunctionMesh {
             f: squircle,
             x_start: -1.0,
             x_end: 1.0,
-            relative_depth: 0.5,
+            relative_depth: 0.2,
             vertices_per_side: 50,
-            vertices_thickness: 10,
+            vertices_thickness: 25,
         }
     }
 }
@@ -29,11 +29,17 @@ fn squircle(x: f32) -> f32 {
 
 impl From<SingleVariableFunctionMesh> for Mesh {
     fn from(mathfunction: SingleVariableFunctionMesh) -> Self {
-        let ring = get_ring_from_math_function(
+        let ring = calculate_ring_of_vertices(
+            mathfunction.f,
             mathfunction.x_start,
             mathfunction.x_end,
-            mathfunction.f,
             mathfunction.vertices_per_side,
+        );
+        let ring2 = calculate_ring_of_vertices(
+            mathfunction.f,
+            mathfunction.x_start,
+            mathfunction.x_end,
+            mathfunction.vertices_thickness,
         );
         let amount = ring.len();
         let mut vertices: Vec<([f32; 3], [f32; 3], [f32; 2])> = Vec::with_capacity(amount + 1);
@@ -42,12 +48,11 @@ impl From<SingleVariableFunctionMesh> for Mesh {
         vertices.push(([0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0]));
         for segment in 0..mathfunction.vertices_thickness {
             for i in 0..amount {
-                let x = ring[i][0];
-                let y = segment as f32
-                    * (mathfunction.x_end - mathfunction.x_start)
-                    * mathfunction.relative_depth
-                    / mathfunction.vertices_thickness as f32;
-                let z = ring[i][1];
+				let vorzeichen = { if ring[i][1] >= 0.0 { 1.0 } else { -1.0 } };
+				let vorzeichen2 = { if ring[i][0] >= 0.0 { 1.0 } else { -1.0 } };
+                let x = ring[i][0] + vorzeichen2 * ring2[segment][1] * mathfunction.relative_depth;
+                let y = ring2[segment][0] / (1.0 / mathfunction.relative_depth);
+                let z = ring[i][1] + vorzeichen * ring2[segment][1] * mathfunction.relative_depth;
                 vertices.push(([x, y, z], [1.0, 1.0, 1.0], [0.0, 0.0]));
             }
         }
@@ -74,10 +79,14 @@ impl From<SingleVariableFunctionMesh> for Mesh {
                     }
                 }
             } else {
-                /*let tl = 0;
-                let tr = 0;
-                let bl = 0;
-                let br = 0;*/
+                for i in 0..amount {
+                    let tl = (segment * amount + i) as u32;
+                    let tr = (segment * amount + i + 1) as u32;
+                    let bl = ((segment - 1) * amount + i) as u32;
+                    let br = ((segment - 1) * amount + i + 1) as u32;
+                    indeces.append(&mut vec![br, tr, tl]);
+                    indeces.append(&mut vec![bl, br, tl]);
+                }
             }
             if segment == mathfunction.vertices_thickness - 1 {
                 for i in 0..amount {
@@ -117,14 +126,13 @@ struct Position {
     slope_in_percentage: f32,
 }
 
-fn get_ring_from_math_function(
+fn calculate_ring_of_vertices(
+    f: fn(f32) -> f32,
     x_start: f32,
     x_end: f32,
-    f: fn(f32) -> f32,
-    vertices_per_side: usize,
+    vertices: usize,
 ) -> Vec<[f32; 2]> {
     assert!(x_start < x_end);
-    assert!(vertices_per_side > 2);
     let delta = 0.000001;
     let start = Position {
         x: x_start,
@@ -136,10 +144,10 @@ fn get_ring_from_math_function(
         y: f(x_end),
         slope_in_percentage: ((f(x_end) - f(x_end - delta)) / (delta)).atan(),
     };
-    let mut vec: Vec<Position> = Vec::with_capacity(vertices_per_side);
+    let mut vec: Vec<Position> = Vec::with_capacity(vertices);
     vec.push(start);
     vec.push(end);
-    for _ in 2..vertices_per_side {
+    for _ in 2..vertices {
         let (mut index, mut max_absolute_difference) = (1, 0.0);
         for j in 1..vec.len() {
             let new_x = vec[j - 1].x + (vec[j].x - vec[j - 1].x) / 2.0;
@@ -161,12 +169,12 @@ fn get_ring_from_math_function(
             },
         );
     }
-    let mut return_vec: Vec<[f32; 2]> = Vec::with_capacity(vertices_per_side);
+    let mut return_vec: Vec<[f32; 2]> = Vec::with_capacity(vertices);
     for e in &vec {
         return_vec.push([e.x, e.y]);
     }
     vec.reverse();
-    vec.remove(vertices_per_side - 1);
+    vec.remove(vertices - 1);
     vec.remove(0);
     for e in &vec {
         return_vec.push([e.x, -e.y]);
