@@ -38,12 +38,28 @@ let mesh: Mesh = SingleVariableFunctionMesh {
     x_start: -1.0,
     x_end: 1.0,
     relative_depth: 0.0,
-    vertices_per_side: 50,
+    vertices_per_side: 30,
     vertices_thickness: 1,
 };
 </pre>
 </td>
 <td><img src="images/squircle.png"></td>
+</tr>
+
+<tr>
+<td>
+<pre>
+let mesh: Mesh = SingleVariableFunctionMesh {
+    f: squircle,
+    x_start: -1.0,
+    x_end: 1.0,
+    relative_depth: 0.2,
+    vertices_per_side: 30,
+    vertices_thickness: 20,
+};
+</pre>
+</td>
+<td><img src="images/squircle3d.png"></td>
 </tr>
 
 </table>
