@@ -1,5 +1,5 @@
 [package]
-name = " bevy-single-variable-function-mesh"
+name = "bevy-single-variable-function-mesh"
 version = "0.1.0"
 authors = ["Armin Schäfer"]
 license-file = "LICENSE"
