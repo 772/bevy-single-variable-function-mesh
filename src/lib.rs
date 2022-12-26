@@ -16,9 +16,9 @@ impl Default for SingleVariableFunctionMesh {
             f: squircle,
             x_start: -1.0,
             x_end: 1.0,
-            relative_depth: 0.2,
+            relative_depth: 0.0,
             vertices_per_side: 30,
-            vertices_thickness: 20,
+            vertices_thickness: 1,
         }
     }
 }
@@ -72,20 +72,19 @@ impl From<SingleVariableFunctionMesh> for Mesh {
         vertices.push(([0.0, height, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0]));
 
         for segment in 0..mathfunction.vertices_thickness {
-            if mathfunction.vertices_thickness == 1 {
-                break;
-            }
             if segment == 0 {
                 for i in 0..amount {
-                    if i == amount - 1 {
-                        indeces.append(&mut vec![1, (i + 1).try_into().unwrap(), 0]);
-                    } else {
-                        indeces.append(&mut vec![
-                            (i + 2).try_into().unwrap(),
-                            (i + 1).try_into().unwrap(),
-                            0,
-                        ]);
-                    }
+					if mathfunction.vertices_thickness != 1 {
+						if i == amount - 1 {
+							indeces.append(&mut vec![1, (i + 1).try_into().unwrap(), 0]);
+						} else {
+							indeces.append(&mut vec![
+								(i + 2).try_into().unwrap(),
+								(i + 1).try_into().unwrap(),
+								0,
+							]);
+						}
+					}
                 }
             } else {
                 for i in 0..amount {
