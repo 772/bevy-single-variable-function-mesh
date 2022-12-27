@@ -58,25 +58,25 @@ impl From<SingleVariableFunctionMesh> for Mesh {
         let height = mathfunction.relative_height;
 
         vertices.push(([0.0, -height, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0]));
-        for segment in 0..mathfunction.vertices_height {
-            for i in 0..amount {
+        for segment in ring2.iter().take(mathfunction.vertices_height) {
+            for ver in ring.iter().take(amount) {
                 let vorzeichen = {
-                    if ring[i][1] >= 0.0 {
+                    if ver[1] >= 0.0 {
                         1.0
                     } else {
                         -1.0
                     }
                 };
                 let vorzeichen2 = {
-                    if ring[i][0] >= 0.0 {
+                    if ver[0] >= 0.0 {
                         1.0
                     } else {
                         -1.0
                     }
                 };
-                let x = ring[i][0] + vorzeichen2 * ring2[segment][1] * mathfunction.relative_height;
-                let y = ring2[segment][0] / (1.0 / mathfunction.relative_height);
-                let z = ring[i][1] + vorzeichen * ring2[segment][1] * mathfunction.relative_height;
+                let x = ver[0] + vorzeichen2 * segment[1] * mathfunction.relative_height;
+                let y = segment[0] / (1.0 / mathfunction.relative_height);
+                let z = ver[1] + vorzeichen * segment[1] * mathfunction.relative_height;
                 vertices.push(([x, y, z], [1.0, 1.0, 1.0], [0.0, 0.0]));
             }
         }
@@ -104,8 +104,8 @@ impl From<SingleVariableFunctionMesh> for Mesh {
                     let bl = ((segment - 1) * amount + i + 1) as u32;
                     let mut br = ((segment - 1) * amount + i + 2) as u32;
                     if i == amount - 1 {
-                        tr = (segment * amount + 0 + 1) as u32;
-                        br = ((segment - 1) * amount + 0 + 1) as u32;
+                        tr = (segment * amount + 1) as u32;
+                        br = ((segment - 1) * amount + 1) as u32;
                     }
                     indeces.append(&mut vec![br, tr, tl]);
                     indeces.append(&mut vec![bl, br, tl]);
