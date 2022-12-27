@@ -1,6 +1,6 @@
 [package]
 name = "bevy-single-variable-function-mesh"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Armin Schäfer"]
 license-file = "LICENSE"
 description = "This crate creates procedurally generated 2D or 3D bevy meshes by using single-variable functions."
