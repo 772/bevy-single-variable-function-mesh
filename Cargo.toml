@@ -2,9 +2,9 @@
 name = "bevy-single-variable-function-mesh"
 version = "0.2.1"
 authors = ["Armin Schäfer"]
-license-file = "LICENSE"
 description = "A 2D polygon or 3D mesh generated from a single-variable function `f(f32) -> f32`."
 repository = "https://github.com/772/bevy-single-variable-function-mesh"
+license = "MIT OR Apache-2.0"
 readme = "README.md"
 edition = "2021"
 categories = ["rendering"]
