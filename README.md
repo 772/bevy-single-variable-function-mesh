@@ -1,8 +1,6 @@
 # bevy-single-variable-function-mesh
 
-This crate creates procedurally generated 2D or 3D bevy meshes by using
-single-variable functions. Since only one function is needed, this library is very
-easy to use.
+A 2D polygon or 3D mesh generated from a single-variable function `f(f32) -> f32`. In total, the mesh contains `vertices_polygon_upper_half` * `vertices_height` + 2 vertices.
 
 ## Usage
 
@@ -10,7 +8,7 @@ Add this to your ```Cargo.toml```:
 
 ```
 [dependencies]
-bevy-single-variable-function-mesh = "0.1"
+bevy-single-variable-function-mesh = "0.2.1"
 ```
 
 And this to your .rs file.
