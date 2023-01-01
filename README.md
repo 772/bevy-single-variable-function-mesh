@@ -1,6 +1,7 @@
 # bevy-single-variable-function-mesh
 
-A 2D polygon or 3D mesh generated from a single-variable function `f(f32) -> f32`. In total, the mesh contains `vertices_polygon_upper_half` * `vertices_height` + 2 vertices.
+A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a
+single-variable function `f(f32) -> f32`.
 
 ## Usage
 
@@ -11,56 +12,60 @@ Add this to your ```Cargo.toml```:
 bevy-single-variable-function-mesh = "0.2.1"
 ```
 
-And this to your .rs file.
-
-```
-use bevy_single_variable_function_mesh::SingleVariableFunctionMesh;
-```
-
 ## Examples
 
-<table>
+We have one math function that generates a half squircle and one that
+generates a half circle.
 
-<tr><th>Source code</th><th>Preview</th></td>
-
-<tr>
-<td>
-<pre>
+```
 fn squircle(x: f32) -> f32 {
     (1.0 - (x).abs().powf(4.0)).powf(0.25)
 }
-</pre>
-<pre>
-let mesh: Mesh = SingleVariableFunctionMesh {
-    f: squircle,
-    x_start: -1.0,
-    x_end: 1.0,
-    relative_depth: 0.0,
-    vertices_per_side: 30,
-    vertices_thickness: 1,
-};
-</pre>
-</td>
-<td><img src="images/squircle.png"></td>
-</tr>
 
-<tr>
-<td>
-<pre>
-let mesh: Mesh = SingleVariableFunctionMesh {
-    f: squircle,
-    x_start: -1.0,
-    x_end: 1.0,
-    relative_depth: 0.2,
-    vertices_per_side: 30,
-    vertices_thickness: 20,
-};
-</pre>
-</td>
-<td><img src="images/squircle3d.png"></td>
-</tr>
+fn circle(x: f32) -> f32 {
+    (1.0 - x.powf(2.0)).powf(0.5)
+}
+```
 
-</table>
+
+<img src="images/squircle.png">
+<img src="images/circle.png">
+
+```
+bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+    f: squircle, // Or circle.
+    relative_height: 0.0,
+	..default()
+}
+```
+
+<img src="images/0.png">
+
+```
+bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+    f: squircle, // Or circle.
+    relative_height: 0.2,
+	..default()
+}
+```
+
+<img src="images/0.2.png">
+
+```
+bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+    f: squircle, // Or circle.
+    relative_height: 1.0,
+	..default()
+}
+```
+
+<img src="images/1.png">
+
+## Details
+
+- This crate will automatically search for good vertices by comparing the slopes.
+- The default function (`f`) is called "squircle" and not "half squircle" in favor of
+short function names and because resulting mesh will be a full squircle.
 
 ## License
 
