@@ -28,8 +28,8 @@ fn circle(x: f32) -> f32 {
 ```
 
 
-<img src="images/squircle.png">
-<img src="images/circle.png">
+<img src="images/plot_squircle.png">
+<img src="images/plot_circle.png">
 
 ```
 bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
