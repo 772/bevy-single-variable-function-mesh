@@ -9,7 +9,7 @@ Add this to your ```Cargo.toml```:
 
 ```
 [dependencies]
-bevy-single-variable-function-mesh = "0.2.1"
+bevy-single-variable-function-mesh = "0.2.3"
 ```
 
 ## Examples
@@ -26,7 +26,6 @@ fn circle(x: f32) -> f32 {
     (1.0 - x.powf(2.0)).powf(0.5)
 }
 ```
-
 
 <img src="images/plot_squircle.png">
 <img src="images/plot_circle.png">
@@ -63,9 +62,9 @@ bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
 
 ## Details
 
-- This crate will automatically search for good vertices by comparing the slopes.
-- The default function (`f`) is called "squircle" and not "half squircle" in favor of
-short function names and because resulting mesh will be a full squircle.
+- Feel free to add ideas to the bug tracker.
+- This crate will automatically search for good vertices by comparing the slopes
+of the input function called `f`.
 
 ## License
 
