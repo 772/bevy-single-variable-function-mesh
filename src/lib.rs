@@ -1,234 +1,159 @@
-use bevy::math::Vec3;
-use bevy::render::mesh::{Indices, Mesh, PrimitiveTopology};
+use bevy::math::f32::Quat;
+use bevy::prelude::*;
+use bevy_single_variable_function_mesh::SingleVariableFunctionMesh;
+use rand::prelude::*;
 
-/// A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a single-variable function
-/// `f(f32) -> f32`.
-#[derive(Debug, Clone, Copy)]
-pub struct SingleVariableFunctionMesh {
-    /// The function to be used as the upper half of the generated polygon.
-    /// The function will be mirrored to the x-axis to generate the lower half of the polygon.
-    /// If the mesh is 3D (`relative_height` > 0.0), the function will also be applied to the
-    /// side vertices.
-    pub f: fn(f32) -> f32,
-    /// `f` starts here. Together with `x_end`, this determines the size of the mesh.
-    /// Must be lower than `x_end`.
-    pub x_start: f32,
-    /// `f` ends here. Together with `x_start`, this determines the size of the mesh.
-    /// Must be bigger than `x_start`.
-    pub x_end: f32,
-    /// The amount of vertices that are used for each upper half of the polygon.
-    /// Should be at least 3.
-    pub vertices: usize,
-    /// If `relative_height` is 0.0, then the mesh is 2D poglygon without height. If 1.0, the mesh
-    /// is fully 3D without any bigger flat surface.
-    pub relative_height: f32,
+fn main() {
+    App::new()
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_startup_system(setup)
+        .add_system(rotate)
+        .run();
 }
 
-impl Default for SingleVariableFunctionMesh {
-    fn default() -> Self {
-        SingleVariableFunctionMesh {
-            f: squircle,
-            x_start: -1.0,
-            x_end: 1.0,
-            vertices: 60,
-            relative_height: 0.1,
-        }
+#[derive(Component)]
+struct Shape;
+
+pub fn big_squircle(x: f32) -> f32 {
+    (1.0 - x.powf(2.0)).powf(0.25) - x * 0.1 - 0.1
+}
+
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    // load a texture and retrieve its aspect ratio
+    let texture_handle = asset_server.load("holz.png");
+    let texture_puni = asset_server.load("puni.png");
+    let texture_red = asset_server.load("red.png");
+    let texture_king = asset_server.load("king.png");
+    //let texture_handle2 = asset_server.load("bildchen3.png");
+
+    // this material renders the texture normally
+    let material_handle = materials.add(StandardMaterial {
+        base_color_texture: Some(texture_handle.clone()),
+        ..default()
+    });
+
+    let blue = materials.add(StandardMaterial {
+        //base_color: Color::rgb(0.686, 0.486, 0.945),
+        base_color_texture: Some(texture_puni.clone()),
+        perceptual_roughness: 0.8,
+        //normal_map_texture: Some(texture_handle2.clone()),
+        ..default()
+    });
+    let red = materials.add(StandardMaterial {
+        base_color_texture: Some(texture_red.clone()),
+        perceptual_roughness: 0.8,
+        ..default()
+    });
+    let king = materials.add(StandardMaterial {
+        base_color_texture: Some(texture_king.clone()),
+        perceptual_roughness: 0.8,
+        ..default()
+    });
+
+    let mut mesh1: Mesh = SingleVariableFunctionMesh {
+        f: big_squircle,
+        relative_height: 0.0,
+        x_start: -1.0,
+        x_end: 0.999,
+        ..default()
     }
-}
+    .into();
+    mesh1.generate_tangents().unwrap();
 
-impl From<SingleVariableFunctionMesh> for Mesh {
-    fn from(mut mathfunction: SingleVariableFunctionMesh) -> Self {
-        debug_assert!(0.0 <= mathfunction.relative_height && mathfunction.relative_height <= 1.0);
-        debug_assert!(mathfunction.x_start < mathfunction.x_end);
-        let ring = calculate_ring_of_vertices(
-            mathfunction.f,
-            mathfunction.x_start,
-            mathfunction.x_end,
-            mathfunction.vertices,
-        );
-        let amount = ring.len();
-        let amount_layers = ring.len() / 2;
-        let mut vertices: Vec<([f32; 3], [f32; 3], [f32; 2])> =
-            Vec::with_capacity(amount * amount_layers + 2);
-        let mut indeces: Vec<u32> = Vec::with_capacity((amount * amount_layers + 2) * 3);
-        if mathfunction.relative_height == 1.0 {
-            mathfunction.relative_height = 0.99; // TODO.
-        }
-
-        vertices.push((
-            [0.0, -mathfunction.relative_height, 0.0],
-            [0.0, -1.0, 0.0],
-            [0.0, 0.0],
-        ));
-        for i in 0..amount_layers {
-            for j in 0..amount {
-                let (mut x, mut z) = (
-                    ring[j].x * (1.0 - mathfunction.relative_height),
-                    ring[j].y * (1.0 - mathfunction.relative_height),
-                );
-                let distance = (x.powf(2.0) + z.powf(2.0)).powf(0.5);
-                let new_distance = ring[i].y * mathfunction.relative_height;
-                (x, z) = (
-                    x / distance * (distance + new_distance),
-                    z / distance * (distance + new_distance),
-                );
-                let y = ring[i].x * mathfunction.relative_height;
-                let mut normal1 =
-                    Vec3::new(-ring[j].slope_in_percentage.tan(), 0.0, 1.0).normalize();
-                let mut normal2 =
-                    Vec3::new(1.0, -ring[i].slope_in_percentage.tan().abs(), 1.0).normalize();
-                if j >= amount / 2 {
-                    normal1[2] = -normal1[2];
-                }
-                if i >= amount_layers / 2 {
-                    normal2[1] = -normal2[1];
-                }
-                if amount_layers > 1 {
-                    normal1[0] = normal1[0] / 3.0 * 2.0;
-                    normal1[1] = normal2[1];
-                    normal1[2] = normal1[2] / 3.0 * 2.0;
-                }
-                vertices.push(([x, y, z], normal1.into(), [0.0, 0.0]));
-            }
-        }
-        vertices.push((
-            [0.0, 1.0 - mathfunction.relative_height, 0.0],
-            [0.0, 1.0, 0.0],
-            [0.0, 0.0],
-        ));
-
-        for segment in 0..mathfunction.vertices {
-            if segment == 0 {
-                for i in 0..amount {
-                    if mathfunction.vertices != 1 {
-                        if i == amount - 1 {
-                            indeces.append(&mut vec![1, (i + 1).try_into().unwrap(), 0]);
-                        } else {
-                            indeces.append(&mut vec![
-                                (i + 2).try_into().unwrap(),
-                                (i + 1).try_into().unwrap(),
-                                0,
-                            ]);
-                        }
-                    }
-                }
-            } else {
-                for i in 0..amount {
-                    let tl = (segment * amount + i + 1) as u32;
-                    let mut tr = (segment * amount + i + 2) as u32;
-                    let bl = ((segment - 1) * amount + i + 1) as u32;
-                    let mut br = ((segment - 1) * amount + i + 2) as u32;
-                    if i == amount - 1 {
-                        tr = (segment * amount + 1) as u32;
-                        br = ((segment - 1) * amount + 1) as u32;
-                    }
-                    indeces.append(&mut vec![br, tr, tl]);
-                    indeces.append(&mut vec![bl, br, tl]);
-                }
-            }
-            if segment == mathfunction.vertices - 1 {
-                for i in 0..amount {
-                    if i == amount - 1 {
-                        indeces.append(&mut vec![
-                            (segment * amount + 2).try_into().unwrap(),
-                            (segment * amount + i + 1).try_into().unwrap(),
-                            (segment * amount + 1).try_into().unwrap(),
-                        ]);
-                    } else {
-                        indeces.append(&mut vec![
-                            (segment * amount + 2).try_into().unwrap(),
-                            (segment * amount + i + 1).try_into().unwrap(),
-                            (segment * amount + i + 2).try_into().unwrap(),
-                        ]);
-                    }
-                }
-            }
-        }
-
-        let positions: Vec<_> = vertices.iter().map(|(p, _, _)| *p).collect();
-        let normals: Vec<_> = vertices.iter().map(|(_, n, _)| *n).collect();
-        let uvs: Vec<_> = vertices.iter().map(|(_, _, uv)| *uv).collect();
-        let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        mesh.set_indices(Some(Indices::U32(indeces)));
-        mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
-        mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
-        mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
-        mesh
+    let mut mesh2: Mesh = SingleVariableFunctionMesh {
+        f: big_squircle,
+        relative_height: 0.0,
+        x_start: -1.0,
+        x_end: 0.999,
+        ..default()
     }
-}
+    .into();
+    mesh2.generate_tangents().unwrap();
 
-/// An example for a single-variable function.
-#[allow(dead_code)]
-pub fn squircle(x: f32) -> f32 {
-    (1.0 - (x).abs().powf(4.0)).powf(0.25)
-}
-
-/// An example for a single-variable function.
-#[allow(dead_code)]
-pub fn circle(x: f32) -> f32 {
-    (1.0 - x.powf(2.0)).powf(0.5)
-}
-
-#[derive(Copy, Clone, Debug)]
-struct Position {
-    x: f32,
-    y: f32,
-    slope_in_percentage: f32,
-}
-
-fn calculate_ring_of_vertices(
-    f: fn(f32) -> f32,
-    x_start: f32,
-    x_end: f32,
-    vertices: usize,
-) -> Vec<Position> {
-    let delta = 0.000001;
-    let start = Position {
-        x: x_start,
-        y: f(x_start),
-        slope_in_percentage: ((f(x_start + delta) - f(x_start)) / (delta)).atan(),
-    };
-    let end = Position {
-        x: x_end,
-        y: f(x_end),
-        slope_in_percentage: ((f(x_end) - f(x_end - delta)) / (delta)).atan(),
-    };
-    let mut vec: Vec<Position> = Vec::with_capacity(vertices);
-    vec.push(start);
-    vec.push(end);
-    for _ in 2..vertices {
-        let (mut index, mut max_slope_difference, mut max_x_difference) = (1, 0.0, 0.0);
-        for j in 1..vec.len() {
-            let new_x = vec[j - 1].x + (vec[j].x - vec[j - 1].x) / 2.0;
-            let new_m = ((f(new_x + delta) - f(new_x)) / (delta)).atan();
-            let x_difference = vec[j].x - vec[j - 1].x;
-            let slope_difference = (new_m - vec[j].slope_in_percentage).abs()
-                + (new_m - vec[j - 1].slope_in_percentage).abs();
-            if slope_difference > max_slope_difference
-                || (slope_difference == max_slope_difference && x_difference > max_x_difference)
-            {
-                (index, max_slope_difference, max_x_difference) =
-                    (j, slope_difference, x_difference);
-            }
-        }
-        let new_x = vec[index - 1].x + (vec[index].x - vec[index - 1].x) / 2.0;
-        vec.insert(
-            index,
-            Position {
-                x: new_x,
-                y: f(new_x),
-                slope_in_percentage: ((f(new_x + delta) - f(new_x)) / (delta)).atan(),
+    let mut gen = rand::thread_rng();
+    for _ in 0..18 {
+        let x: f32 = gen.gen_range(0..1600) as f32 / 100.0;
+        let z: f32 = gen.gen_range(0..2000) as f32 / 100.0;
+        let height: f32 = gen.gen_range(0..100) as f32 / 100.0;
+        let rotation: f32 = gen.gen_range(0..100) as f32 / 100.0;
+        commands.spawn((
+            PbrBundle {
+                mesh: meshes.add(mesh1.clone()),
+                material: blue.clone(),
+                transform: Transform {
+                    translation: [-8.0 + x, 1.0, 3.0 - z].into(),
+                    scale: [1.0, 0.5 + height, 1.0].into(),
+                    rotation: Quat::from_xyzw(0.0, -0.5 + rotation, 0.0, 1.0),
+                },
+                ..default()
             },
-        );
+            Shape,
+        ));
     }
-    let mut lower_half = vec.clone();
-    lower_half.reverse();
-    for vertex in &lower_half {
-        vec.push(Position {
-            x: vertex.x,
-            y: -vertex.y,
-            slope_in_percentage: vertex.slope_in_percentage,
-        });
+    for _ in 0..4 {
+        let x: f32 = gen.gen_range(0..1600) as f32 / 100.0;
+        let z: f32 = gen.gen_range(0..2000) as f32 / 100.0;
+        let height: f32 = gen.gen_range(0..100) as f32 / 100.0;
+        let rotation: f32 = gen.gen_range(0..100) as f32 / 100.0;
+        commands.spawn((
+            PbrBundle {
+                mesh: meshes.add(mesh1.clone()),
+                material: red.clone(),
+                transform: Transform {
+                    translation: [-8.0 + x, 1.0, 3.0 - z].into(),
+                    scale: [1.0, 0.5 + height, 1.0].into(),
+                    rotation: Quat::from_xyzw(0.0, -0.5 + rotation, 0.0, 1.0),
+                },
+                ..default()
+            },
+            Shape,
+        ));
     }
-    vec
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(mesh1.clone()),
+            material: king.clone(),
+            transform: Transform {
+                translation: [0.0, 1.0, 3.5].into(),
+                scale: [2.0, 1.4, 2.0].into(),
+                rotation: Quat::from_xyzw(0.0, 0.0, 0.0, 1.0),
+            },
+            ..default()
+        },
+        Shape,
+    ));
+
+    commands.spawn(PointLightBundle {
+        point_light: PointLight {
+            intensity: 9000.0,
+            range: 100.,
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_xyz(8.0, 16.0, 8.0),
+        ..default()
+    });
+
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(shape::Plane { size: 60. }.into()),
+        transform: Transform::from_xyz(0.0, 0.0, -10.0),
+        material: material_handle,
+        ..default()
+    });
+
+    commands.spawn(Camera3dBundle {
+        transform: Transform::from_xyz(0.0, 6., 12.0).looking_at(Vec3::new(0., 1., 0.), Vec3::Y),
+        ..default()
+    });
+}
+
+fn rotate(mut query: Query<&mut Transform, With<Shape>>, time: Res<Time>) {
+    for mut transform in &mut query {
+        transform.rotate_x(time.delta_seconds() / 2.);
+    }
 }
