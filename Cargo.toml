@@ -1,6 +1,6 @@
 [package]
 name = "bevy-single-variable-function-mesh"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Armin Schäfer"]
 description = "A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a single-variable function `f(f32) -> f32`."
 repository = "https://github.com/772/bevy-single-variable-function-mesh"
