@@ -3,15 +3,6 @@
 A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a
 single-variable function `f(f32) -> f32`.
 
-## Usage
-
-Add this to your ```Cargo.toml```:
-
-```
-[dependencies]
-bevy-single-variable-function-mesh = "0.2.4"
-```
-
 ## Examples
 
 We have one math function that generates a half squircle and one that
