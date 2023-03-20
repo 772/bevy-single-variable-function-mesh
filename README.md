@@ -9,7 +9,7 @@ Add this to your ```Cargo.toml```:
 
 ```
 [dependencies]
-bevy-single-variable-function-mesh = "0.2.3"
+bevy-single-variable-function-mesh = "0.2.4"
 ```
 
 ## Examples
