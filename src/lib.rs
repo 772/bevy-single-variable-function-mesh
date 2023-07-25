@@ -226,9 +226,13 @@ fn calculate_ring_of_vertices(
         }
     }
     let mut lower_half = vec.clone();
-    lower_half.remove(0);
+    if f(lower_half[0].x) != 0.0 {
+        lower_half.remove(0);
+    }
     lower_half.reverse();
-    lower_half.remove(0);
+    if f(lower_half[0].x) != 0.0 {
+        lower_half.remove(0);
+    }
     for vertex in &lower_half {
         vec.push(Position {
             x: vertex.x,
@@ -237,4 +241,27 @@ fn calculate_ring_of_vertices(
         });
     }
     (vec, maximum)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn square(_x: f32) -> f32 {
+        1.0
+    }
+
+    #[test]
+    fn test_amoount_of_vertices() {
+        let circle_2d_mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+            f: circle,
+            relative_height: 0.0,
+            ..default()
+        };
+        let square_2d_mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+            f: circle,
+            relative_height: 0.0,
+            ..default()
+        };
+    }
 }
