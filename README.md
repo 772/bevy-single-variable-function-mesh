@@ -27,31 +27,34 @@ fn circle(x: f32) -> f32 {
 <img src="images/plot_circle.png">
 
 ```
-bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+let mesh: Mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
     f: squircle, // Or circle.
     relative_height: 0.0,
-	..default()
+    ..default()
 }
+.into();
 ```
 
 <img src="images/0.png">
 
 ```
-bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+let mesh: Mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
     f: squircle, // Or circle.
     relative_height: 0.2,
-	..default()
+    ..default()
 }
+.into();
 ```
 
 <img src="images/0.2.png">
 
 ```
-bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+let mesh: Mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
     f: squircle, // Or circle.
     relative_height: 1.0,
-	..default()
+    ..default()
 }
+.into();
 ```
 
 <img src="images/1.png">
