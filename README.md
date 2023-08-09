@@ -1,5 +1,10 @@
 # bevy-single-variable-function-mesh
 
+[![License: MIT/Apache](https://img.shields.io/badge/License-MIT%20or%20Apache2-blue.svg)](https://opensource.org/licenses/MIT)
+[![Doc](https://docs.rs/bevy-single-variable-function-mesh/badge.svg)](https://docs.rs/bevy-single-variable-function-mesh)
+[![Crate](https://img.shields.io/crates/v/bevy-single-variable-function-mesh.svg)](https://crates.io/crates/bevy-single-variable-function-mesh)
+[![Bevy tracking](https://img.shields.io/badge/Bevy%20tracking-v0.11-lightblue)](https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking)
+
 A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a
 single-variable function `f(f32) -> f32`.
 
