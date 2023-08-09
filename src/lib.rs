@@ -252,16 +252,26 @@ mod tests {
     }
 
     #[test]
-    fn test_amoount_of_vertices() {
-        let circle_2d_mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
+    fn test_amount_of_vertices() {
+        let square_2d_mesh: Mesh = SingleVariableFunctionMesh {
+            f: square,
+            relative_height: 0.0,
+            x_start: -1.0,
+            x_end: 1.0,
+            vertices: 20,
+        }
+        .into();
+        let circle_2d_mesh: Mesh = SingleVariableFunctionMesh {
             f: circle,
             relative_height: 0.0,
-            ..default()
-        };
-        let square_2d_mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
-            f: circle,
-            relative_height: 0.0,
-            ..default()
-        };
+            x_start: -1.0,
+            x_end: 1.0,
+            vertices: 20,
+        }
+        .into();
+        assert_eq!(
+            square_2d_mesh.count_vertices(),
+            circle_2d_mesh.count_vertices() - 2
+        );
     }
 }
