@@ -26,37 +26,49 @@ fn circle(x: f32) -> f32 {
 <img src="images/plots.png">
 
 ```
-let mesh: Mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
-    f: squircle, // Or circle.
-    relative_height: 0.0,
+commands.spawn(PbrBundle {
+    mesh: meshes.add(
+        SingleVariableFunctionMesh {
+            f: squircle, // or circle
+            relative_height: 0.0,
+            ..default()
+        }
+        .into(),
+    ),
+    material: materials.add(StandardMaterial::default()),
+    transform: Transform::from_xyz(-2.5, 1.0, 0.0),
     ..default()
-}
-.into();
-```
-
-<img src="images/0.png">
-
-```
-let mesh: Mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
-    f: squircle, // Or circle.
-    relative_height: 0.2,
+});
+commands.spawn(PbrBundle {
+    mesh: meshes.add(
+        SingleVariableFunctionMesh {
+            f: squircle, // or circle
+            relative_height: 0.2,
+            ..default()
+        }
+        .into(),
+    ),
+    material: materials.add(StandardMaterial::default()),
+    transform: Transform::from_xyz(0.0, 1.0, 0.0),
     ..default()
-}
-.into();
-```
-
-<img src="images/0.2.png">
-
-```
-let mesh: Mesh = bevy_single_variable_function_mesh::SingleVariableFunctionMesh {
-    f: squircle, // Or circle.
-    relative_height: 1.0,
+});
+commands.spawn(PbrBundle {
+    mesh: meshes.add(
+        SingleVariableFunctionMesh {
+            f: squircle, // or circle
+            relative_height: 1.0,
+            ..default()
+        }
+        .into(),
+    ),
+    material: materials.add(StandardMaterial::default()),
+    transform: Transform::from_xyz(2.5, 1.0, 0.0),
     ..default()
-}
-.into();
+});
 ```
 
-<img src="images/1.png">
+<img src="images/squircles.png">
+<img src="images/circles.png">
 
 ## Details
 
