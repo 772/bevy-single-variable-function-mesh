@@ -75,6 +75,7 @@ commands.spawn(PbrBundle {
 - Feel free to add ideas to the bug tracker.
 - This crate will automatically search for good vertices by comparing the slopes
 of the input function called `f`.
+- The plane in the render scene was created by ```f: |_x: f32| -> f32 { 20.0 },```.
 
 ## License
 
