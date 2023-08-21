@@ -77,6 +77,12 @@ commands.spawn(PbrBundle {
 of the input function called `f`.
 - The plane in the render scene was created by ```f: |_x: f32| -> f32 { 20.0 },```.
 
+## Compatible Bevy Version
+
+| bevy  | bevy-single-variable-function-mesh |
+|-------|------------------------------------|
+| 0.11  | 0.11                               |
+
 ## License
 
 Licensed under either of these:
