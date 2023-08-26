@@ -13,7 +13,7 @@ single-variable function `f(f32) -> f32`.
 We have one math function that generates a half squircle and one that
 generates a half circle.
 
-```
+```rust
 fn squircle(x: f32) -> f32 {
     (1.0 - (x).abs().powf(4.0)).powf(0.25)
 }
@@ -25,7 +25,7 @@ fn circle(x: f32) -> f32 {
 
 <img src="images/plots.png">
 
-```
+```rust
 commands.spawn(PbrBundle {
     mesh: meshes.add(
         SingleVariableFunctionMesh {
