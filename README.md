@@ -81,6 +81,7 @@ of the input function called `f`.
 
 | bevy  | bevy-single-variable-function-mesh |
 |-------|------------------------------------|
+| 0.12  | 0.12                               |
 | 0.11  | 0.11                               |
 
 ## License
