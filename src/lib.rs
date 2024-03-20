@@ -1,5 +1,6 @@
 use bevy::math::Vec3;
 use bevy::render::mesh::{Indices, Mesh, PrimitiveTopology};
+use bevy::render::render_asset::RenderAssetUsages;
 
 /// A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a single-variable function
 /// `f(f32) -> f32`.
@@ -148,8 +149,11 @@ impl From<SingleVariableFunctionMesh> for Mesh {
         let positions: Vec<_> = vertices.iter().map(|(p, _, _)| *p).collect();
         let normals: Vec<_> = vertices.iter().map(|(_, n, _)| *n).collect();
         let uvs: Vec<_> = vertices.iter().map(|(_, _, uv)| *uv).collect();
-        let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        mesh.set_indices(Some(Indices::U32(indeces)));
+        let mut mesh = Mesh::new(
+            PrimitiveTopology::TriangleList,
+            RenderAssetUsages::default(),
+        );
+        mesh.insert_indices(Indices::U32(indeces));
         mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
         mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
         mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
