@@ -5,7 +5,7 @@
 [![Crate](https://img.shields.io/crates/v/bevy-single-variable-function-mesh.svg)](https://crates.io/crates/bevy-single-variable-function-mesh)
 
 A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a
-single-variable function `f(f32) -> f32`.
+single-variable function `fn(f32) -> f32`.
 
 ## Examples
 
