@@ -28,11 +28,11 @@ fn circle(x: f32) -> f32 {
 commands.spawn(PbrBundle {
     mesh: meshes.add(
         SingleVariableFunctionMesh {
-            f: squircle, // or circle
-            relative_height: 0.0,
+            f1: squircle, // or circle
+            f2: squircle, // or circle
+            f2_x_end: 0.0,
             ..default()
-        }
-        .into(),
+        },
     ),
     material: materials.add(StandardMaterial::default()),
     transform: Transform::from_xyz(-2.5, 1.0, 0.0),
@@ -41,11 +41,11 @@ commands.spawn(PbrBundle {
 commands.spawn(PbrBundle {
     mesh: meshes.add(
         SingleVariableFunctionMesh {
-            f: squircle, // or circle
-            relative_height: 0.2,
+            f1: squircle, // or circle
+            f2: squircle, // or circle
+            f2_x_end: 0.2,
             ..default()
-        }
-        .into(),
+        },
     ),
     material: materials.add(StandardMaterial::default()),
     transform: Transform::from_xyz(0.0, 1.0, 0.0),
@@ -54,11 +54,11 @@ commands.spawn(PbrBundle {
 commands.spawn(PbrBundle {
     mesh: meshes.add(
         SingleVariableFunctionMesh {
-            f: squircle, // or circle
-            relative_height: 1.0,
+            f1: squircle, // or circle
+            f2: squircle, // or circle
+            f2_x_end: 1.0,
             ..default()
-        }
-        .into(),
+        },
     ),
     material: materials.add(StandardMaterial::default()),
     transform: Transform::from_xyz(2.5, 1.0, 0.0),
@@ -80,6 +80,7 @@ of the input function called `f`.
 
 | bevy  | bevy-single-variable-function-mesh |
 |-------|------------------------------------|
+| 0.14  | 0.15                               |
 | 0.14  | 0.14                               |
 | 0.13  | 0.13                               |
 | 0.12  | 0.12                               |

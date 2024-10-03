@@ -8,50 +8,61 @@ use bevy::render::render_asset::RenderAssetUsages;
 pub struct SingleVariableFunctionMesh {
     /// The function to be used as the upper half of the generated polygon.
     /// The function will be mirrored to the x-axis to generate the lower half of the polygon.
-    /// If the mesh is 3D (`relative_height` > 0.0), the function will also be applied to the
+    /// If the mesh is 3D, the function will also be applied to the
     /// side vertices. Default = squircle.
-    pub f: fn(f32) -> f32,
+    pub f1: fn(f32) -> f32,
     /// `f` starts here. Together with `x_end`, this determines the size of the mesh.
     /// Must be lower than `x_end`. Default = -1.0.
-    pub x_start: f32,
+    pub f1_x_start: f32,
     /// `f` ends here. Together with `x_start`, this determines the size of the mesh.
     /// Must be bigger than `x_start`. Default = 1.0.
-    pub x_end: f32,
+    pub f1_x_end: f32,
     /// The amount of vertices that are used for each upper half of the polygon.
     /// Should be at least 3. There will be (n - 2) * (2 * n - 2) + 2 vertices in total
-    /// if `relative_height` > 0.0.  Default = 30.0.
-    pub vertices: usize,
-    /// If `relative_height` is 0.0, then the mesh is a 2D poglygon without height. If 1.0,
-    /// the mesh is fully 3D without any bigger flat surface. Default = 0.1.
-    pub relative_height: f32,
+    /// if 3D.  Default = 30.0.
+    pub f1_vertices: usize,
+    pub f2: fn(f32) -> f32,
+    pub f2_x_start: f32,
+    pub f2_x_end: f32,
+    pub f2_vertices: usize,
 }
 
 impl Default for SingleVariableFunctionMesh {
     fn default() -> Self {
         SingleVariableFunctionMesh {
-            f: squircle,
-            x_start: -1.0,
-            x_end: 1.0,
-            vertices: 30,
-            relative_height: 0.1,
+            f1: squircle,
+            f1_x_start: -1.0,
+            f1_x_end: 1.0,
+            f1_vertices: 30,
+            f2: squircle,
+            f2_x_start: 0.0,
+            f2_x_end: 1.0,
+            f2_vertices: 30,
         }
     }
 }
 
 impl From<SingleVariableFunctionMesh> for Mesh {
     fn from(mathfunction: SingleVariableFunctionMesh) -> Self {
-        debug_assert!(0.0 <= mathfunction.relative_height && mathfunction.relative_height <= 1.0);
-        debug_assert!(mathfunction.x_start < mathfunction.x_end);
+        debug_assert!(mathfunction.f1_x_start <= mathfunction.f1_x_end);
+        debug_assert!(mathfunction.f2_x_start <= mathfunction.f2_x_end);
         let (ring, maximum) = calculate_ring_of_vertices(
-            mathfunction.f,
-            mathfunction.x_start,
-            mathfunction.x_end,
-            mathfunction.vertices,
+            mathfunction.f1,
+            mathfunction.f1_x_start,
+            mathfunction.f1_x_end,
+            mathfunction.f1_vertices,
         );
-        let width_maximum = mathfunction.x_end - mathfunction.x_start;
+        let (_ring2, _maximum2) = calculate_ring_of_vertices(
+            mathfunction.f2,
+            mathfunction.f2_x_start,
+            mathfunction.f2_x_end,
+            mathfunction.f2_vertices,
+        );
+        let width_maximum = mathfunction.f1_x_end - mathfunction.f1_x_start;
         let amount = ring.len();
         let mut amount_layers = (ring.len() - 2) / 2;
-        if mathfunction.relative_height == 0.0 {
+        let relative_height = mathfunction.f2_x_end - mathfunction.f2_x_start;
+        if relative_height == 0.0 {
             amount_layers = 1;
         }
 
@@ -59,29 +70,25 @@ impl From<SingleVariableFunctionMesh> for Mesh {
         let mut vertices: Vec<([f32; 3], [f32; 3], [f32; 2])> =
             Vec::with_capacity(amount * amount_layers + 2);
         vertices.push((
-            [
-                0.0,
-                mathfunction.x_start * mathfunction.relative_height,
-                0.0,
-            ],
+            [0.0, mathfunction.f1_x_start * relative_height, 0.0],
             [0.0, -1.0, 0.0],
             [0.5, 0.5],
         ));
-        if mathfunction.relative_height >= 0.0 {
+        if relative_height >= 0.0 {
             for i in 0..amount_layers {
                 for j in 0..amount {
                     let (mut x, mut z) = (ring[j].x, ring[j].y);
                     (x, z) = (
                         x.signum()
                             * (x.abs()
-                                * (ring[i].y * mathfunction.relative_height
-                                    + maximum * (1.0 - mathfunction.relative_height))),
+                                * (ring[i].y * relative_height
+                                    + maximum * (1.0 - relative_height))),
                         z.signum()
                             * (z.abs()
-                                * (ring[i].y * mathfunction.relative_height
-                                    + maximum * (1.0 - mathfunction.relative_height))),
+                                * (ring[i].y * relative_height
+                                    + maximum * (1.0 - relative_height))),
                     );
-                    let y = ring[i].x * mathfunction.relative_height;
+                    let y = ring[i].x * relative_height;
 
                     let mut normal_horizontally =
                         Vec3::new(-ring[j].slope_in_percentage.tan(), 0.0, 1.0).normalize();
@@ -101,14 +108,14 @@ impl From<SingleVariableFunctionMesh> for Mesh {
 
                     let realtive_texture_size = 1.0 - (y / maximum.abs());
                     let uv_x =
-                        (x * realtive_texture_size + mathfunction.x_start.abs()) / width_maximum;
+                        (x * realtive_texture_size + mathfunction.f1_x_start.abs()) / width_maximum;
                     let uv_y = (z * realtive_texture_size + maximum) / (maximum * 2.0);
                     vertices.push(([x, y, z], normals, [uv_x, uv_y]));
                 }
             }
         }
         vertices.push((
-            [0.0, mathfunction.x_end * mathfunction.relative_height, 0.0],
+            [0.0, mathfunction.f1_x_end * relative_height, 0.0],
             [0.0, 1.0, 0.0],
             [0.5, 0.5],
         ));
@@ -258,19 +265,25 @@ mod tests {
     #[test]
     fn test_amount_of_vertices() {
         let square_2d_mesh: Mesh = SingleVariableFunctionMesh {
-            f: square,
-            relative_height: 0.0,
-            x_start: -1.0,
-            x_end: 1.0,
-            vertices: 20,
+            f1: square,
+            f1_x_start: -1.0,
+            f1_x_end: 1.0,
+            f1_vertices: 20,
+            f2: square,
+            f2_x_start: 0.0,
+            f2_x_end: 0.0,
+            f2_vertices: 20,
         }
         .into();
         let circle_2d_mesh: Mesh = SingleVariableFunctionMesh {
-            f: circle,
-            relative_height: 0.0,
-            x_start: -1.0,
-            x_end: 1.0,
-            vertices: 20,
+            f1: circle,
+            f1_x_start: -1.0,
+            f1_x_end: 1.0,
+            f1_vertices: 20,
+            f2: circle,
+            f2_x_start: 0.0,
+            f2_x_end: 0.0,
+            f2_vertices: 20,
         }
         .into();
         assert_eq!(
