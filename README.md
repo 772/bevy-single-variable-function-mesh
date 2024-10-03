@@ -102,16 +102,15 @@ commands.spawn(PbrBundle {
 
 ## Details
 
-- Feel free to add ideas to the bug tracker.
 - This crate will automatically search for good vertices by comparing the slopes
-of the input function called `f`.
-- The plane in the render scene was created by ```f: |_x: f32| -> f32 { 20.0 },```.
+of the input functions.
+- In the future releases, the UV mapping might change.
 
 ## Compatible Bevy Version
 
 | bevy  | bevy-single-variable-function-mesh |
 |-------|------------------------------------|
-| 0.14  | 0.15                               |
+| 0.15  | 0.15                               |
 | 0.14  | 0.14                               |
 | 0.13  | 0.13                               |
 | 0.12  | 0.12                               |
