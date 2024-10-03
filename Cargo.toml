@@ -2,7 +2,7 @@
 name = "bevy-single-variable-function-mesh"
 version = "0.15.0"
 authors = ["Armin Schäfer"]
-description = "A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a single-variable function `f(f32) -> f32`."
+description = "A 2D or 3D mesh generated from single-variable functions."
 repository = "https://github.com/772/bevy-single-variable-function-mesh"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
