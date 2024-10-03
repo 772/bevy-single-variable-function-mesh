@@ -11,10 +11,10 @@ pub struct SingleVariableFunctionMesh {
     /// If the mesh is 3D, the function will also be applied to the
     /// side vertices. Default = squircle.
     pub f1: fn(f32) -> f32,
-    /// `f` starts here. Together with `x_end`, this determines the size of the mesh.
+    /// `f1` starts here. Together with `x_end`, this determines the size of the mesh.
     /// Must be lower than `x_end`. Default = -1.0.
     pub f1_x_start: f32,
-    /// `f` ends here. Together with `x_start`, this determines the size of the mesh.
+    /// `f1` ends here. Together with `x_start`, this determines the size of the mesh.
     /// Must be bigger than `x_start`. Default = 1.0.
     pub f1_x_end: f32,
     /// The amount of vertices that are used for each upper half of the polygon.
@@ -30,14 +30,14 @@ pub struct SingleVariableFunctionMesh {
 impl Default for SingleVariableFunctionMesh {
     fn default() -> Self {
         SingleVariableFunctionMesh {
-            f1: squircle,
+            f1: |_x: f32| -> f32 { 1.0 },
             f1_x_start: -1.0,
             f1_x_end: 1.0,
-            f1_vertices: 30,
-            f2: squircle,
-            f2_x_start: 0.0,
+            f1_vertices: 18,
+            f2: |_x: f32| -> f32 { 1.0 },
+            f2_x_start: -1.0,
             f2_x_end: 1.0,
-            f2_vertices: 30,
+            f2_vertices: 18,
         }
     }
 }
@@ -46,76 +46,72 @@ impl From<SingleVariableFunctionMesh> for Mesh {
     fn from(mathfunction: SingleVariableFunctionMesh) -> Self {
         debug_assert!(mathfunction.f1_x_start <= mathfunction.f1_x_end);
         debug_assert!(mathfunction.f2_x_start <= mathfunction.f2_x_end);
-        let (ring, maximum) = calculate_ring_of_vertices(
+        let (ring_horizontal, maximum1) = calculate_ring_of_vertices(
             mathfunction.f1,
             mathfunction.f1_x_start,
             mathfunction.f1_x_end,
             mathfunction.f1_vertices,
+            true,
         );
-        let (_ring2, _maximum2) = calculate_ring_of_vertices(
+        let (ring_vertical, _) = calculate_ring_of_vertices(
             mathfunction.f2,
             mathfunction.f2_x_start,
             mathfunction.f2_x_end,
             mathfunction.f2_vertices,
+            false,
         );
         let width_maximum = mathfunction.f1_x_end - mathfunction.f1_x_start;
-        let amount = ring.len();
-        let mut amount_layers = (ring.len() - 2) / 2;
-        let relative_height = mathfunction.f2_x_end - mathfunction.f2_x_start;
-        if relative_height == 0.0 {
+        let amount = ring_horizontal.len();
+        let mut amount_layers = mathfunction.f2_vertices - 1;
+        if mathfunction.f2_x_start == mathfunction.f2_x_end {
             amount_layers = 1;
         }
 
-        // Create vertices.
         let mut vertices: Vec<([f32; 3], [f32; 3], [f32; 2])> =
             Vec::with_capacity(amount * amount_layers + 2);
         vertices.push((
-            [0.0, mathfunction.f1_x_start * relative_height, 0.0],
+            [0.0, mathfunction.f2_x_start, 0.0],
             [0.0, -1.0, 0.0],
             [0.5, 0.5],
         ));
-        if relative_height >= 0.0 {
-            for i in 0..amount_layers {
-                for j in 0..amount {
-                    let (mut x, mut z) = (ring[j].x, ring[j].y);
+        for i in 0..amount_layers {
+            for j in 0..amount {
+                // Place vertices.
+                let (mut x, mut z) = (ring_horizontal[j].x, ring_horizontal[j].y);
+                if amount_layers > 1 {
                     (x, z) = (
-                        x.signum()
-                            * (x.abs()
-                                * (ring[i].y * relative_height
-                                    + maximum * (1.0 - relative_height))),
-                        z.signum()
-                            * (z.abs()
-                                * (ring[i].y * relative_height
-                                    + maximum * (1.0 - relative_height))),
+                        x.signum() * (x.abs() * ring_vertical[i].y),
+                        z.signum() * (z.abs() * ring_vertical[i].y),
                     );
-                    let y = ring[i].x * relative_height;
-
-                    let mut normal_horizontally =
-                        Vec3::new(-ring[j].slope_in_percentage.tan(), 0.0, 1.0).normalize();
-                    if j >= amount / 2 {
-                        normal_horizontally[2] = -normal_horizontally[2];
-                    }
-                    let normal_vertical =
-                        Vec3::new(1.0, -ring[i].slope_in_percentage.tan(), 1.0).normalize();
-                    let mut normals = [
-                        normal_horizontally[0] / 3.0 * 2.0,
-                        normal_vertical[1],
-                        normal_horizontally[2] / 3.0 * 2.0,
-                    ];
-                    if amount_layers == 1 {
-                        normals = [0.0, 1.0, 0.0];
-                    }
-
-                    let realtive_texture_size = 1.0 - (y / maximum.abs());
-                    let uv_x =
-                        (x * realtive_texture_size + mathfunction.f1_x_start.abs()) / width_maximum;
-                    let uv_y = (z * realtive_texture_size + maximum) / (maximum * 2.0);
-                    vertices.push(([x, y, z], normals, [uv_x, uv_y]));
                 }
+                let y = ring_vertical[i].x;
+
+                // Create normals.
+                let mut normal_horizontally =
+                    Vec3::new(-ring_horizontal[j].slope_in_percentage.tan(), 0.0, 1.0).normalize();
+
+                if j >= amount / 2 {
+                    normal_horizontally[2] = -normal_horizontally[2];
+                }
+                let normal_vertical =
+                    Vec3::new(1.0, -ring_vertical[i].slope_in_percentage.tan(), 1.0).normalize();
+                let mut normals = [
+                    normal_horizontally[0] / 3.0 * 2.0,
+                    normal_vertical[1],
+                    normal_horizontally[2] / 3.0 * 2.0,
+                ];
+                if amount_layers == 1 {
+                    normals = [0.0, 1.0, 0.0];
+                }
+                let realtive_texture_size = 1.0 - (y / maximum1.abs());
+                let uv_x =
+                    (x * realtive_texture_size + mathfunction.f1_x_start.abs()) / width_maximum;
+                let uv_y = (z * realtive_texture_size + maximum1) / (maximum1 * 2.0);
+                vertices.push(([x, y, z], normals, [uv_x, uv_y]));
             }
         }
         vertices.push((
-            [0.0, mathfunction.f1_x_end * relative_height, 0.0],
+            [0.0, mathfunction.f2_x_end, 0.0],
             [0.0, 1.0, 0.0],
             [0.5, 0.5],
         ));
@@ -168,18 +164,6 @@ impl From<SingleVariableFunctionMesh> for Mesh {
     }
 }
 
-/// An example for a single-variable function.
-#[allow(dead_code)]
-pub fn squircle(x: f32) -> f32 {
-    (1.0 - (x).abs().powf(4.0)).powf(0.25)
-}
-
-/// An example for a single-variable function.
-#[allow(dead_code)]
-pub fn circle(x: f32) -> f32 {
-    (1.0 - x.powf(2.0)).powf(0.5)
-}
-
 #[derive(Copy, Clone, Debug)]
 struct Position {
     x: f32,
@@ -192,6 +176,7 @@ fn calculate_ring_of_vertices(
     x_start: f32,
     x_end: f32,
     vertices: usize,
+    generate_lower_half: bool,
 ) -> (Vec<Position>, f32) {
     let delta = 0.000001;
     let start = Position {
@@ -235,6 +220,9 @@ fn calculate_ring_of_vertices(
         if f(new_x) > maximum {
             maximum = f(new_x);
         }
+    }
+    if !generate_lower_half {
+        return (vec, maximum);
     }
     let mut lower_half = vec.clone();
     if f(lower_half[0].x) != 0.0 {
