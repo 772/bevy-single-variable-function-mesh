@@ -74,27 +74,23 @@ impl From<SingleVariableFunctionMesh> for Mesh {
             [0.0, -1.0, 0.0],
             [0.5, 0.5],
         ));
-        for i in 0..amount_layers {
-            for j in 0..amount {
+        for i in ring_vertical.iter().take(amount_layers) {
+            for (k, j) in ring_horizontal.iter().enumerate().take(amount) {
                 // Place vertices.
-                let (mut x, mut z) = (ring_horizontal[j].x, ring_horizontal[j].y);
+                let (mut x, mut z) = (j.x, j.y);
                 if amount_layers > 1 {
-                    (x, z) = (
-                        x.signum() * (x.abs() * ring_vertical[i].y),
-                        z.signum() * (z.abs() * ring_vertical[i].y),
-                    );
+                    (x, z) = (x.signum() * (x.abs() * i.y), z.signum() * (z.abs() * i.y));
                 }
-                let y = ring_vertical[i].x;
+                let y = i.x;
 
                 // Create normals.
                 let mut normal_horizontally =
-                    Vec3::new(-ring_horizontal[j].slope_in_percentage.tan(), 0.0, 1.0).normalize();
+                    Vec3::new(-j.slope_in_percentage.tan(), 0.0, 1.0).normalize();
 
-                if j >= amount / 2 {
+                if k >= amount / 2 {
                     normal_horizontally[2] = -normal_horizontally[2];
                 }
-                let normal_vertical =
-                    Vec3::new(1.0, -ring_vertical[i].slope_in_percentage.tan(), 1.0).normalize();
+                let normal_vertical = Vec3::new(1.0, -i.slope_in_percentage.tan(), 1.0).normalize();
                 let mut normals = [
                     normal_horizontally[0] / 3.0 * 2.0,
                     normal_vertical[1],
