@@ -25,76 +25,75 @@ fn circle(x: f32) -> f32 {
 
 ```rust
 // Flat ground.
-commands.spawn(PbrBundle {
-	mesh: meshes.add(SingleVariableFunctionMesh {
+commands.spawn((
+	Mesh3d(meshes.add(SingleVariableFunctionMesh {
 		f1: |_x: f32| -> f32 { 10.0 },
 		f1_x_start: -10.0,
 		f1_x_end: 10.0,
 		f2_x_start: 0.0,
 		f2_x_end: 0.0,
 		..default()
-	}),
-	material: materials.add(StandardMaterial::default()),
-	transform: Transform::from_xyz(0.0, 0.0, 0.0),
-	..default()
-});
+	})),
+	MeshMaterial3d(materials.add(StandardMaterial::default())),
+	Transform::from_xyz(0.0, 0.0, 0.0),
+));
+
 // Flat squircle.
-commands.spawn(PbrBundle {
-	mesh: meshes.add(SingleVariableFunctionMesh {
+commands.spawn((
+	Mesh3d(meshes.add(SingleVariableFunctionMesh {
 		f1: squircle,
 		f2_x_start: 0.0,
 		f2_x_end: 0.0,
 		..default()
-	}),
-	material: materials.add(StandardMaterial::default()),
-	transform: Transform::from_xyz(-4.0, 1.0, 0.0),
-	..default()
-});
+	})),
+	MeshMaterial3d(materials.add(StandardMaterial::default())),
+	Transform::from_xyz(-4.0, 1.0, 0.0),
+));
+
 // A bit flat squircle.
-commands.spawn(PbrBundle {
-	mesh: meshes.add(SingleVariableFunctionMesh {
+commands.spawn((
+	Mesh3d(meshes.add(SingleVariableFunctionMesh {
 		f1: squircle,
 		f2: |x: f32| -> f32 { (1.0 - (x * 5.0).abs().powf(4.0)).powf(0.25) },
 		f2_x_start: -0.2,
 		f2_x_end: 0.2,
 		..default()
-	}),
-	material: materials.add(StandardMaterial::default()),
-	transform: Transform::from_xyz(-2.0, 1.0, 0.0),
-	..default()
-});
+	})),
+	MeshMaterial3d(materials.add(StandardMaterial::default())),
+	Transform::from_xyz(-2.0, 1.0, 0.0),
+));
+
 // Cylinder.
-commands.spawn(PbrBundle {
-	mesh: meshes.add(SingleVariableFunctionMesh {
+commands.spawn((
+	Mesh3d(meshes.add(SingleVariableFunctionMesh {
 		f1: circle,
 		f2: straight,
 		..default()
-	}),
-	material: materials.add(StandardMaterial::default()),
-	transform: Transform::from_xyz(0.0, 1.0, 0.0),
-	..default()
-});
+	})),
+	MeshMaterial3d(materials.add(StandardMaterial::default())),
+	Transform::from_xyz(0.0, 1.0, 0.0),
+));
+
 // Ball.
-commands.spawn(PbrBundle {
-	mesh: meshes.add(SingleVariableFunctionMesh {
+commands.spawn((
+	Mesh3d(meshes.add(SingleVariableFunctionMesh {
 		f1: circle,
 		f2: circle,
 		..default()
-	}),
-	material: materials.add(StandardMaterial::default()),
-	transform: Transform::from_xyz(2.0, 1.0, 0.0),
-	..default()
-});
+	})),
+	MeshMaterial3d(materials.add(StandardMaterial::default())),
+	Transform::from_xyz(2.0, 1.0, 0.0),
+));
+
 // Pyramid.
-commands.spawn(PbrBundle {
-	mesh: meshes.add(SingleVariableFunctionMesh {
+commands.spawn((
+	Mesh3d(meshes.add(SingleVariableFunctionMesh {
 		f2: |x: f32| -> f32 { -0.5 * x + 0.5 },
 		..default()
-	}),
-	material: materials.add(StandardMaterial::default()),
-	transform: Transform::from_xyz(4.0, 1.0, 0.0),
-	..default()
-});
+	})),
+	MeshMaterial3d(materials.add(StandardMaterial::default())),
+	Transform::from_xyz(4.0, 1.0, 0.0),
+));
 ```
 
 <img src="images/examples.png">
