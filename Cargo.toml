@@ -11,4 +11,4 @@ categories = ["rendering"]
 keywords = ["graphics"]
 
 [dependencies]
-bevy = "0.14"
+bevy = "0.15"
