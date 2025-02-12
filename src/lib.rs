@@ -99,10 +99,8 @@ impl From<SingleVariableFunctionMesh> for Mesh {
                 if amount_layers == 1 {
                     normals = [0.0, 1.0, 0.0];
                 }
-                let realtive_texture_size = 1.0 - (y / maximum1.abs());
-                let uv_x =
-                    (x * realtive_texture_size + mathfunction.f1_x_start.abs()) / width_maximum;
-                let uv_y = (z * realtive_texture_size + maximum1) / (maximum1 * 2.0);
+                let uv_x = (x + mathfunction.f1_x_start.abs()) / width_maximum;
+                let uv_y = (z + maximum1) / (maximum1 * 2.0);
                 vertices.push(([x, y, z], normals, [uv_x, uv_y]));
             }
         }
