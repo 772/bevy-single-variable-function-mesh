@@ -108,6 +108,7 @@ of the input functions.
 
 | bevy  | bevy-single-variable-function-mesh |
 |-------|------------------------------------|
+| 0.16  | 0.16                               |
 | 0.15  | 0.15                               |
 | 0.14  | 0.14                               |
 | 0.13  | 0.13                               |
