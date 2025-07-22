@@ -2,7 +2,7 @@
 [![Doc](https://docs.rs/bevy-single-variable-function-mesh/badge.svg)](https://docs.rs/bevy-single-variable-function-mesh)
 [![Crate](https://img.shields.io/crates/v/bevy-single-variable-function-mesh.svg)](https://crates.io/crates/bevy-single-variable-function-mesh)
 
-# What is bevy-single-variable-function-mesh?
+## What is bevy-single-variable-function-mesh?
 
 A 2D or 3D mesh generated from single-variable functions.
 
