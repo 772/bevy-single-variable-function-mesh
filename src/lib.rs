@@ -240,6 +240,10 @@ fn calculate_ring_of_vertices(
 mod tests {
     use super::*;
 
+    fn circle(x: f32) -> f32 {
+        (1.0 - x.powf(2.0)).powf(0.5)
+    }
+
     fn square(_x: f32) -> f32 {
         1.0
     }
