@@ -1,8 +1,8 @@
-# bevy-single-variable-function-mesh
-
 [![License: MIT/Apache](https://img.shields.io/badge/License-MIT%20or%20Apache2-blue.svg)](https://opensource.org/licenses/MIT)
 [![Doc](https://docs.rs/bevy-single-variable-function-mesh/badge.svg)](https://docs.rs/bevy-single-variable-function-mesh)
 [![Crate](https://img.shields.io/crates/v/bevy-single-variable-function-mesh.svg)](https://crates.io/crates/bevy-single-variable-function-mesh)
+
+# What is bevy-single-variable-function-mesh?
 
 A 2D or 3D mesh generated from single-variable functions.
 
