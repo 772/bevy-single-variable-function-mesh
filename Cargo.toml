@@ -4,11 +4,22 @@ version = "0.16.0"
 authors = ["Armin Schäfer"]
 description = "A 2D or 3D mesh generated from single-variable functions."
 repository = "https://github.com/772/bevy-single-variable-function-mesh"
-license = "MIT OR Apache-2.0"
 readme = "README.md"
-edition = "2021"
+license-file = "LICENSE"
+edition = "2024"
 categories = ["rendering"]
 keywords = ["graphics"]
 
 [dependencies]
 bevy = "0.16"
+
+[profile.dev]
+opt-level = 0
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[features]
+dev = [
+    "bevy/dynamic_linking",
+]
