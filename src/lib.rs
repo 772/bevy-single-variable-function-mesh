@@ -1,6 +1,6 @@
+use bevy::asset::RenderAssetUsages;
 use bevy::math::Vec3;
 use bevy::mesh::{Indices, Mesh, PrimitiveTopology};
-use bevy::asset::RenderAssetUsages;
 
 /// A 2D or 3D mesh (`bevy::render::mesh::Mesh`) generated from a single-variable function
 /// `f(f32) -> f32`.
