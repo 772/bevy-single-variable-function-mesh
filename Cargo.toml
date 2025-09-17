@@ -11,7 +11,7 @@ categories = ["rendering"]
 keywords = ["graphics"]
 
 [dependencies]
-bevy = "0.16"
+bevy = "=0.17.0-rc.1"
 
 [profile.dev]
 opt-level = 0
