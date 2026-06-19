@@ -11,7 +11,7 @@ categories = ["rendering"]
 keywords = ["graphics"]
 
 [dependencies]
-bevy = { version = "0.18", default-features = false, features = ["3d"] }
+bevy = { version = "0.19", default-features = false, features = ["3d"] }
 
 [profile.dev]
 opt-level = 0
