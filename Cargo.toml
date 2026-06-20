@@ -1,6 +1,6 @@
 [package]
 name = "bevy-single-variable-function-mesh"
-version = "0.18.0"
+version = "0.19.0"
 authors = ["Armin Schäfer"]
 description = "A 2D or 3D mesh generated from single-variable functions."
 repository = "https://github.com/772/bevy-single-variable-function-mesh"
